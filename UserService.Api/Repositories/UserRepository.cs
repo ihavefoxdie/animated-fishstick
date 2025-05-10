@@ -1,11 +1,11 @@
 ﻿using UserService.Api.Data;
 using UserService.Api.Repositories.Interfaces;
-using UserService.Models;
-using UserService.Models.DTOs;
+using UserService.Api.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace UserService.Api.Repositories;
 
-public class UserRepository : IUserRepository<UserDTO>, IDisposable
+public class UserRepository : IUserRepository<User>, IDisposable
 {
     private readonly UserDbContext _userDbContext;
 
@@ -14,9 +14,10 @@ public class UserRepository : IUserRepository<UserDTO>, IDisposable
         _userDbContext = userDbContext;
     }
 
-    public void Create(UserDTO user)
+    public async Task Create(User user)
     {
-        throw new NotImplementedException();
+        await _userDbContext.AddAsync(user);
+        await _userDbContext.SaveChangesAsync();
     }
 
     public void Dispose()
@@ -24,17 +25,17 @@ public class UserRepository : IUserRepository<UserDTO>, IDisposable
         throw new NotImplementedException();
     }
 
-    public IEnumerable<UserDTO> Read()
+    public async Task<IEnumerable<User>> Read()
+    {
+        return await _userDbContext.Users.ToListAsync();
+    }
+
+    public async Task<User> Read(User user)
     {
         throw new NotImplementedException();
     }
 
-    public UserDTO Read(UserDTO user)
-    {
-        throw new NotImplementedException();
-    }
-
-    public void Update(UserDTO user)
+    public async Task Update(User user)
     {
         throw new NotImplementedException();
     }

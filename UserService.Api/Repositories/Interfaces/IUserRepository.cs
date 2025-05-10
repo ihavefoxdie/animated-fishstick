@@ -2,8 +2,8 @@
 
 public interface IUserRepository<T> : IDisposable
 {
-    void Create(T user);
-    void Update(T user);
-    IEnumerable<T> Read();
-    T Read(T user);
+    Task Create(T user);
+    //Task Update(T user);
+    Task<IEnumerable<T>> Read();
+    //Task<T> Read(T user);
 }
