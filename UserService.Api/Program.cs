@@ -4,7 +4,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using UserService.Api.Data;
+using UserService.Api.Entities;
 using UserService.Api.Repositories.Interfaces;
+using UserService.Api.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -73,6 +75,7 @@ builder.Services.AddSwaggerGen(options =>
 builder.Services.AddDbContextPool<UserDbContext>(
     options => options.UseNpgsql(builder.Configuration.GetConnectionString("UserServiceConnection"))
 );
+builder.Services.AddScoped<IUserRepository<User>, UserRepository>();
 var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

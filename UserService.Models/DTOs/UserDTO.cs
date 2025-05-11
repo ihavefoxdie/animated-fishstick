@@ -15,6 +15,6 @@ public class UserDTO
     public string CreatedBy { get; set; }
     public DateTime ModifiedOn { get; set; }
     public string ModifiedBy { get; set; }
-    public DateTime RevokedOn { get; set; }
-    public string RevokedBy { get; set; }
+    public DateTime? RevokedOn { get; set; }
+    public string? RevokedBy { get; set; }
 }
