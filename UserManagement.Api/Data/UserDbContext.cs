@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using UserService.Api.Authentication;
-using UserService.Api.Entities;
+using UserManagement.Api.Authentication;
+using UserManagement.Api.Entities;
 
-namespace UserService.Api.Data;
+namespace UserManagement.Api.Data;
 
 public class UserDbContext : DbContext
 {

@@ -1,10 +1,10 @@
-﻿using UserService.Api.Data;
-using UserService.Api.Repositories.Interfaces;
-using UserService.Api.Entities;
+﻿using UserManagement.Api.Data;
+using UserManagement.Api.Repositories.Interfaces;
+using UserManagement.Api.Entities;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
-namespace UserService.Api.Repositories;
+namespace UserManagement.Api.Repositories;
 
 public class UserRepository : IUserRepository<User>, IDisposable
 {
@@ -56,18 +56,15 @@ public class UserRepository : IUserRepository<User>, IDisposable
 
         if (userToUpdate != null)
         {
-            userToUpdate.Guid = user.Guid;
             userToUpdate.Login = user.Login;
             userToUpdate.Password = user.Password;
             userToUpdate.Name = user.Name;
             userToUpdate.Gender = user.Gender;
             userToUpdate.Birthday = user.Birthday;
             userToUpdate.Admin = user.Admin;
-            userToUpdate.CreatedOn = user.CreatedOn;
-            userToUpdate.CreatedBy = user.CreatedBy;
-            userToUpdate.ModifiedOn = user.ModifiedOn;
+            userToUpdate.ModifiedOn = DateTime.UtcNow;
             userToUpdate.ModifiedBy = user.ModifiedBy;
-            userToUpdate.RevokedOn = user.RevokedOn;
+            userToUpdate.RevokedOn = DateTime.UtcNow;
             userToUpdate.RevokedBy = user.RevokedBy;
             await _userDbContext.SaveChangesAsync();
         }

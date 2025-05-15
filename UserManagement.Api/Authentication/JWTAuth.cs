@@ -2,9 +2,9 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
-using UserService.Api.Entities;
+using UserManagement.Api.Entities;
 
-namespace UserService.Api.Authorization;
+namespace UserManagement.Api.Authorization;
 
 internal sealed class JWTAuth
 {

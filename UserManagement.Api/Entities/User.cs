@@ -1,9 +1,11 @@
-using System;
+﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.EntityFrameworkCore;
 
-namespace UserService.Models.DTOs;
+namespace UserManagement.Api.Entities;
 
-public class UserDTO
+public class User
 {
+    [Key]
     public Guid Guid { get; set; }
     public string Login { get; set; }
     public string Password { get; set; }

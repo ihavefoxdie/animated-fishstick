@@ -1,6 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 
-namespace UserService.Utils;
+namespace UserManagement.Utils;
 
 public static partial class RegularExpressions
 {

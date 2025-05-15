@@ -3,10 +3,10 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using UserService.Api.Data;
-using UserService.Api.Entities;
-using UserService.Api.Repositories.Interfaces;
-using UserService.Api.Repositories;
+using UserManagement.Api.Data;
+using UserManagement.Api.Entities;
+using UserManagement.Api.Repositories.Interfaces;
+using UserManagement.Api.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 

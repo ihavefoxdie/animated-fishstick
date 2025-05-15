@@ -1,6 +1,6 @@
 ﻿using System.Linq.Expressions;
 
-namespace UserService.Api.Repositories.Interfaces;
+namespace UserManagement.Api.Repositories.Interfaces;
 
 public interface IUserRepository<T> : IDisposable
 {
