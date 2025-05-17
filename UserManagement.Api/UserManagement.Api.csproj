@@ -25,6 +25,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\UserManagement.Models\UserManagement.Models.csproj" />
+    <ProjectReference Include="..\UserManagement.Utils\UserManagement.Utils.csproj" />
     <ProjectReference Include="..\UserService.Models\UserManagement.Models.csproj" />
   </ItemGroup>
 

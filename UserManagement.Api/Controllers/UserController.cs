@@ -1,10 +1,8 @@
-using UserManagement.Api.Entities;
 using Microsoft.AspNetCore.Mvc;
-using UserManagement.Api.Repositories.Interfaces;
-using Microsoft.AspNetCore.Identity;
 using UserManagement.Models.DTOs;
 using UserManagement.Api.Authentication;
-using UserManagement.Api.Services;
+using Microsoft.AspNetCore.Authorization;
+using UserManagement.Api.Services.Interfaces;
 
 namespace UserManagement.Api.Controllers
 {
@@ -14,14 +12,15 @@ namespace UserManagement.Api.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
-        private readonly UserService _userService;
-        private readonly IUserRepository<User> _userRepository;
+        private readonly IUserService _userService;
 
-        public UserController(IUserRepository<User> userRepository, UserService userService)
+        public UserController(IUserService userService)
         {
-            _userRepository = userRepository;
             _userService = userService;
         }
+
+
+
 
         #region Post 
         [HttpPost]
@@ -30,6 +29,14 @@ namespace UserManagement.Api.Controllers
             return Ok();
         }
 
+        [Authorize(Roles = "Admin")]
+        [HttpPost]
+        public ActionResult AuthTest()
+        {
+            return Ok();
+        }
+
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<ActionResult> Create([FromBody] UserDTO user, string login, string password, bool admin, string createdBy)
         {
@@ -103,11 +110,31 @@ namespace UserManagement.Api.Controllers
         /// <param name="login">A new login value</param>
         /// <returns></returns>
         [HttpPut]
-        public async Task<ActionResult> UpdateLogin(Guid guid, string login)
+        public async Task<ActionResult> UpdateLogin(string login)
         {
             try
             {
                 await _userService.UpdateLogin(login);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return ReturnError(ex);
+            }
+        }
+
+        [HttpPut]
+        public async Task<ActionResult<UserDTO>> Restore(string login)
+        {
+            try
+            {
+                UserDTO? user = await _userService.Restore(login);
+
+                if (user == null)
+                {
+                    return NotFound();
+                }
+
                 return Ok();
             }
             catch (Exception ex)
@@ -132,6 +159,7 @@ namespace UserManagement.Api.Controllers
             }
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpGet]
         public async Task<ActionResult> Read(string login)
         {
@@ -152,17 +180,20 @@ namespace UserManagement.Api.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult> Login(string login, string password)
+        public async Task<ActionResult<string>> Login(string login, string password)
         {
             try
             {
-                UserDTO? user = await _userService.Login(login, password);
+                var result = await _userService.Login(login, password);
+                string? token = result.Item1;
+                UserDTO? user = result.Item2;
+
                 if (user == null)
                 {
                     return NotFound();
                 }
 
-                return Ok(user);
+                return Ok(token);
             }
             catch (Exception ex)
             {
@@ -173,6 +204,7 @@ namespace UserManagement.Api.Controllers
 
 
         #region Delete
+        [Authorize(Roles = "Admin")]
         [HttpDelete]
         public async Task<ActionResult<UserDTO>> DeleteHard(string login)
         {
@@ -193,6 +225,7 @@ namespace UserManagement.Api.Controllers
             }
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpDelete]
         public async Task<ActionResult<UserDTO>> DeleteSoft(string login)
         {

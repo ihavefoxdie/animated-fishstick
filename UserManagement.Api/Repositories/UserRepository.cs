@@ -64,7 +64,7 @@ public class UserRepository : IUserRepository<User>, IDisposable
             userToUpdate.Admin = user.Admin;
             userToUpdate.ModifiedOn = DateTime.UtcNow;
             userToUpdate.ModifiedBy = user.ModifiedBy;
-            userToUpdate.RevokedOn = DateTime.UtcNow;
+            userToUpdate.RevokedOn = user.RevokedOn;
             userToUpdate.RevokedBy = user.RevokedBy;
             await _userDbContext.SaveChangesAsync();
         }

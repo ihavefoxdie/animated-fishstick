@@ -4,12 +4,12 @@ using System.Text;
 using Microsoft.IdentityModel.Tokens;
 using UserManagement.Api.Entities;
 
-namespace UserManagement.Api.Authorization;
+namespace UserManagement.Api.Authentication;
 
-internal sealed class JWTAuth
+public sealed class JWTAuth
 {
     private readonly IConfiguration _configuration;
-    
+
     public JWTAuth(IConfiguration configuration)
     {
         _configuration = configuration;
@@ -17,7 +17,7 @@ internal sealed class JWTAuth
 
     public string CreateToken(User user)
     {
-        string secretKey = _configuration["ApplicationSettings:JWT:Secret"];
+        string secretKey = _configuration["ApplicationSettings:JWT:Secret"] ?? throw new ArgumentNullException("The JWT secret is missing!");
         SymmetricSecurityKey securityKey = new(Encoding.UTF8.GetBytes(secretKey));
 
         SigningCredentials credentials = new(securityKey, SecurityAlgorithms.HmacSha256);
@@ -28,12 +28,12 @@ internal sealed class JWTAuth
             [
                 new Claim(JwtRegisteredClaimNames.Sub, user.Guid.ToString()),
                 new Claim(JwtRegisteredClaimNames.Nickname, user.Login),
+                new Claim("role", user.Admin ? "Admin" : "User"),
             ]),
             Expires = DateTime.UtcNow.AddMinutes(_configuration.GetValue<int>("ApplicationSettings:JWT:ExpirationInMinutes")),
             SigningCredentials = credentials,
-            //TODO: add an issuer and an audience
-            //Issuer
-            //Audience
+            Issuer = _configuration["ApplicationSettings:JWT:ValidIssuer"],
+            Audience = _configuration["ApplicationSettings:JWT:ValidAudience"]
         };
 
         JwtSecurityTokenHandler tokenHandler = new();

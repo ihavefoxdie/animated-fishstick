@@ -7,52 +7,65 @@ using UserManagement.Api.Data;
 using UserManagement.Api.Entities;
 using UserManagement.Api.Repositories.Interfaces;
 using UserManagement.Api.Repositories;
+using UserManagement.Api.Services;
+using UserManagement.Api.Services.Interfaces;
+using UserManagement.Api.Authentication;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 
 builder.Services.AddControllers();
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
+
+builder.Services.AddScoped<IUserRepository<User>, UserRepository>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddSingleton<JWTAuth>();
+
+builder.Services.AddDbContextPool<UserDbContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("UserServiceConnection"))
+);
+
 builder.Services.AddAuthorization();
-builder.Services.AddAuthentication(
-    cfg =>
+builder.Services.AddAuthentication(cfg =>
     {
         cfg.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
         cfg.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
         cfg.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
     }
-).AddJwtBearer(
-    x =>
+).AddJwtBearer(x =>
     {
-        //x.RequireHttpsMetadata = true;
+        x.RequireHttpsMetadata = false;
         x.SaveToken = false;
         x.TokenValidationParameters = new()
         {
             ValidateIssuerSigningKey = true,
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["ApplicationSettings:JWT:Secret"])),
-            ValidateIssuer = false,
-            ValidateAudience = false,
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidIssuer = builder.Configuration["ApplicationSettings:JWT:ValidIssuer"],
+            ValidAudience = builder.Configuration["ApplicationSettings:JWT:ValidAudience"],
             ClockSkew = TimeSpan.Zero,
         };
     }
 );
+
+
 builder.Services.AddSwaggerGen(options =>
 {
-    options.SwaggerDoc("v1", new OpenApiInfo 
-    { 
+    options.SwaggerDoc("v1", new OpenApiInfo
+    {
         Title = "InventoryAPI",
         Version = "v1"
     });
 
     // Define security scheme
-    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()
+    options.AddSecurityDefinition(JwtBearerDefaults.AuthenticationScheme, new OpenApiSecurityScheme()
     {
-        Type = SecuritySchemeType.ApiKey,
-        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        Name = "Authentication",
         In = ParameterLocation.Header,
-        Scheme = "Bearer",
+        Scheme = JwtBearerDefaults.AuthenticationScheme,
         BearerFormat = "JWT"
     });
 
@@ -65,32 +78,26 @@ builder.Services.AddSwaggerGen(options =>
                     Reference = new OpenApiReference
                     {
                         Type = ReferenceType.SecurityScheme,
-                        Id = "Bearer"
+                        Id = JwtBearerDefaults.AuthenticationScheme
                     }
                 },
                 Array.Empty<string>()
             }
         });
 });
-builder.Services.AddDbContextPool<UserDbContext>(
-    options => options.UseNpgsql(builder.Configuration.GetConnectionString("UserServiceConnection"))
-);
-builder.Services.AddScoped<IUserRepository<User>, UserRepository>();
+
+
 var app = builder.Build();
-// Configure the HTTP request pipeline.
+
+
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
 app.UseHttpsRedirection();
-
 app.UseAuthentication();
-
 app.UseAuthorization();
-
 app.MapControllers();
-
 app.Run();
