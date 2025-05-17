@@ -206,9 +206,20 @@ public class UserService : IUserService
     {
         IEnumerable<User> users = _userRepository.ReadAll(x =>
         {
-            if (x.Birthday != null && (DateTime.UtcNow.Year - x.Birthday.Value.Year) > age)
+            if (x.Birthday != null)
             {
-                return true;
+                DateTime currentDate = DateTime.UtcNow;
+                int n = currentDate.Year - x.Birthday.Value.Year;
+
+                if (x.Birthday > currentDate.AddYears(-n))
+                {
+                    n--;
+                }
+
+                if (n > age)
+                {
+                    return true;
+                }
             }
             return false;
         });
