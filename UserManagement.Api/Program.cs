@@ -59,6 +59,9 @@ builder.Services.AddSwaggerGen(options =>
         Version = "v1"
     });
 
+    var filePath = Path.Combine(System.AppContext.BaseDirectory, "MyApi.xml");
+    options.IncludeXmlComments(filePath);
+
     // Define security scheme
     options.AddSecurityDefinition(JwtBearerDefaults.AuthenticationScheme, new OpenApiSecurityScheme()
     {

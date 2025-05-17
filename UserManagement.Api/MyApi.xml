@@ -1,0 +1,402 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>UserManagement.Api</name>
+    </assembly>
+    <members>
+        <member name="T:UserManagement.Api.Authentication.JWTAuth">
+            <summary>
+            Class for generating JWT tokens
+            </summary>
+        </member>
+        <member name="M:UserManagement.Api.Authentication.JWTAuth.#ctor(Microsoft.Extensions.Configuration.IConfiguration)">
+            <summary>
+            Constructor for configuration assignment
+            </summary>
+            <param name="configuration">Configuration to use</param>
+        </member>
+        <member name="M:UserManagement.Api.Authentication.JWTAuth.CreateToken(UserManagement.Api.Entities.User)">
+            <summary>
+            Generates a token based on the User object parameter values (id, nickname, role)
+            </summary>
+            <param name="user">User to create a token for</param>
+            <returns>Generated token</returns>
+            <exception cref="T:System.ArgumentNullException">The exception that is thrown when configuration couldn't be read or JWT required fields are missing.</exception>
+        </member>
+        <member name="T:UserManagement.Api.Authentication.PasswordHasher">
+            <summary>
+            This class is used for hashing passwords and/or verifying them using bcrypt
+            </summary>
+        </member>
+        <member name="M:UserManagement.Api.Authentication.PasswordHasher.HashPassword(System.String)">
+            <summary>
+            Password hasher, using Bcrypt
+            </summary>
+            <param name="password">Password to hash</param>
+            <returns></returns>
+        </member>
+        <member name="M:UserManagement.Api.Authentication.PasswordHasher.VerifyPassword(System.String,System.String)">
+            <summary>
+            Compare passed password with a hashed one
+            </summary>
+            <param name="password">Passed in password</param>
+            <param name="hashedPassword">Hashed password</param>
+            <returns></returns>
+        </member>
+        <member name="T:UserManagement.Api.Controllers.UserController">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:UserManagement.Api.Controllers.UserController.#ctor(UserManagement.Api.Services.Interfaces.IUserService)">
+            <summary>
+            A controller for user management
+            </summary>
+            <param name="userService">User service implementation to use</param>
+        </member>
+        <member name="M:UserManagement.Api.Controllers.UserController.Test">
+            <summary>
+            Checks if this controller is functional
+            </summary>
+            <returns>Result</returns>
+        </member>
+        <member name="M:UserManagement.Api.Controllers.UserController.AdminTest">
+            <summary>
+            Checks if admin authorization is working
+            </summary>
+            <returns>Result</returns>
+        </member>
+        <member name="M:UserManagement.Api.Controllers.UserController.UserTest">
+            <summary>
+            Checks if user authorization is working
+            </summary>
+            <returns>Result</returns>
+        </member>
+        <member name="M:UserManagement.Api.Controllers.UserController.Create(UserManagement.Models.DTOs.UserDTO,System.String,System.String,System.Boolean)">
+            <summary>
+            User creation method, only accessible to admins
+            </summary>
+            <param name="user">User object with basic information</param>
+            <param name="login">User login</param>
+            <param name="password">User password</param>
+            <param name="admin">Is the user going to be an admin</param>
+            <returns>Response.</returns>
+        </member>
+        <member name="M:UserManagement.Api.Controllers.UserController.UpdateInfo(System.String,System.String,System.Int32,System.String)">
+            <summary>
+            Update method for changing name, gender and birthday of the user specified
+            </summary>
+            <param name="login">User login</param>
+            <param name="name">A new name value</param>
+            <param name="gender">A new gender value</param>
+            <param name="birthday">A new birthday value</param>
+            <returns>Response with the corresponding UserDTO object.</returns>
+        </member>
+        <member name="M:UserManagement.Api.Controllers.UserController.UpdatePassword(System.String,System.String)">
+            <summary>
+            Update method for changing password of the user specified
+            </summary>
+            <param name="login">User login</param>
+            <param name="password">A new password value</param>
+            <returns>Response.</returns>
+        </member>
+        <member name="M:UserManagement.Api.Controllers.UserController.UpdateLogin(System.String,System.String)">
+            <summary>
+            Update method for changing login of the user specified
+            </summary>
+            <param name="login">User login</param>
+            <param name="newLogin">A new login value</param>
+            <returns>Response.</returns>
+        </member>
+        <member name="M:UserManagement.Api.Controllers.UserController.Restore(System.String)">
+            <summary>
+            Lifts user's access restrictions
+            </summary>
+            <param name="login">User login</param>
+            <returns>Response with the corresponding UserDTO object.</returns>
+        </member>
+        <member name="M:UserManagement.Api.Controllers.UserController.ReadAllActive">
+            <summary>
+            Returns every active user
+            </summary>
+            <returns>Response with the user object</returns>
+        </member>
+        <member name="M:UserManagement.Api.Controllers.UserController.Read(System.String)">
+            <summary>
+            Returns a found user by the specified login
+            </summary>
+            <param name="login">User login</param>
+            <returns>Response with the corresponding UserDTO object.</returns>
+        </member>
+        <member name="M:UserManagement.Api.Controllers.UserController.GetAllOlder(System.Int32)">
+            <summary>
+            Returns every user older than the age specified
+            </summary>
+            <param name="age">Age value</param>
+            <returns>Response with a list of UserDTO objects of the users found.</returns>
+        </member>
+        <member name="M:UserManagement.Api.Controllers.UserController.Login(System.String,System.String)">
+            <summary>
+            Login method
+            </summary>
+            <param name="login">User login</param>
+            <param name="password">User password</param>
+            <returns>Response with a generated access token.</returns>
+        </member>
+        <member name="M:UserManagement.Api.Controllers.UserController.DeleteHard(System.String)">
+            <summary>
+            Completely deletes the specified user
+            </summary>
+            <param name="login">User login</param>
+            <returns>Response with the corresponding UserDTO object.</returns>
+        </member>
+        <member name="M:UserManagement.Api.Controllers.UserController.DeleteSoft(System.String)">
+            <summary>
+            Revokes access of the user specified
+            </summary>
+            <param name="login">User login</param>
+            <returns>Response with the corresponding UserDTO object.</returns>
+        </member>
+        <member name="T:UserManagement.Api.Data.UserDbContext">
+            <summary>
+            DbContext for User entity
+            </summary>
+        </member>
+        <member name="P:UserManagement.Api.Data.UserDbContext.Users">
+            <summary>
+            User entity table
+            </summary>
+        </member>
+        <member name="M:UserManagement.Api.Data.UserDbContext.#ctor(Microsoft.EntityFrameworkCore.DbContextOptions{UserManagement.Api.Data.UserDbContext})">
+            <inheritdoc />
+        </member>
+        <member name="M:UserManagement.Api.Data.UserDbContext.OnModelCreating(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="T:UserManagement.Api.Migrations.InitialMigration">
+            <inheritdoc />
+        </member>
+        <member name="M:UserManagement.Api.Migrations.InitialMigration.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:UserManagement.Api.Migrations.InitialMigration.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:UserManagement.Api.Migrations.InitialMigration.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="T:UserManagement.Api.Repositories.Interfaces.IUserRepository`1">
+            <summary>
+            User repository interface
+            </summary>
+            <typeparam name="T">Entity to use</typeparam>
+        </member>
+        <member name="M:UserManagement.Api.Repositories.Interfaces.IUserRepository`1.Create(`0)">
+            <summary>
+            Saves a new item to the database
+            </summary>
+            <param name="user">Item to save</param>
+            <returns>A Task.</returns>
+        </member>
+        <member name="M:UserManagement.Api.Repositories.Interfaces.IUserRepository`1.Update(`0)">
+            <summary>
+            Updates the specified object (if it exists)
+            </summary>
+            <param name="user">Item to update</param>
+            <returns>Updated object.</returns>
+        </member>
+        <member name="M:UserManagement.Api.Repositories.Interfaces.IUserRepository`1.ReadAll(System.Func{`0,System.Boolean})">
+            <summary>
+            Gets every item that matches the query.
+            </summary>
+            <param name="exp">"Expression representing the query filter</param>
+            <returns>A collection of items found.</returns>
+        </member>
+        <member name="M:UserManagement.Api.Repositories.Interfaces.IUserRepository`1.Read(System.Linq.Expressions.Expression{System.Func{`0,System.Boolean}})">
+            <summary>
+            Gets a specific item that matches the query.
+            </summary>
+            <param name="exp">"Expression representing the query filter</param>
+            <returns>Found item if successful, otherwise null.</returns>
+        </member>
+        <member name="M:UserManagement.Api.Repositories.Interfaces.IUserRepository`1.Delete(`0)">
+            <summary>
+            Deletes the item specified
+            </summary>
+            <param name="user">Item to delete</param>
+            <returns>Deleted item if successful, otherwise null.</returns>
+        </member>
+        <member name="T:UserManagement.Api.Repositories.UserRepository">
+            <summary>
+            IUserRepository implementation with the User entity
+            </summary>
+        </member>
+        <member name="M:UserManagement.Api.Repositories.UserRepository.#ctor(UserManagement.Api.Data.UserDbContext)">
+            <summary>
+            UserRepository constructor
+            </summary>
+            <param name="userDbContext">DbContext to use</param>
+        </member>
+        <member name="M:UserManagement.Api.Repositories.UserRepository.Create(UserManagement.Api.Entities.User)">
+            <inheritdoc />
+        </member>
+        <member name="M:UserManagement.Api.Repositories.UserRepository.Dispose(System.Boolean)">
+            <inheritdoc />
+        </member>
+        <member name="M:UserManagement.Api.Repositories.UserRepository.Dispose">
+            <inheritdoc />
+        </member>
+        <member name="M:UserManagement.Api.Repositories.UserRepository.ReadAll(System.Func{UserManagement.Api.Entities.User,System.Boolean})">
+            <inheritdoc />
+        </member>
+        <member name="M:UserManagement.Api.Repositories.UserRepository.Read(System.Linq.Expressions.Expression{System.Func{UserManagement.Api.Entities.User,System.Boolean}})">
+            <inheritdoc />
+        </member>
+        <member name="M:UserManagement.Api.Repositories.UserRepository.Update(UserManagement.Api.Entities.User)">
+            <inheritdoc />
+        </member>
+        <member name="M:UserManagement.Api.Repositories.UserRepository.Delete(UserManagement.Api.Entities.User)">
+            <inheritdoc />
+        </member>
+        <member name="T:UserManagement.Api.Services.Interfaces.IUserService">
+            <summary>
+            A user interface
+            </summary>
+        </member>
+        <member name="M:UserManagement.Api.Services.Interfaces.IUserService.CreateUser(UserManagement.Models.DTOs.UserDTO,System.String,System.String,System.Boolean,System.String)">
+            <summary>
+            Creates a new user
+            </summary>
+            <param name="user">General user information</param>
+            <param name="login">User login</param>
+            <param name="password">User password</param>
+            <param name="admin">Is this user going to be an admin</param>
+            <param name="createdBy">Login of the user initiating the creation</param>
+            <returns>A Task</returns>
+        </member>
+        <member name="M:UserManagement.Api.Services.Interfaces.IUserService.UpdateUserInfo(System.String,System.String,System.Int32,System.String,System.String)">
+            <summary>
+            Updates user information
+            </summary>
+            <param name="login">Login of the user whose details will be modified</param>
+            <param name="name">New name</param>
+            <param name="gender">New gender value</param>
+            <param name="birthday">New birthday date</param>
+            <param name="modifiedBy">Login of the user initiating the update</param>
+            <returns>A UserDTO object corresponding to the new data.</returns>
+        </member>
+        <member name="M:UserManagement.Api.Services.Interfaces.IUserService.UpdateUserPassword(System.String,System.String,System.String)">
+            <summary>
+            Updates user password
+            </summary>
+            <param name="login">Login of the user whose password will be modified</param>
+            <param name="password">New password</param>
+            <param name="modifiedBy">Login of the user initiating the update</param>
+            <returns>A Task.</returns>
+        </member>
+        <member name="M:UserManagement.Api.Services.Interfaces.IUserService.UpdateLogin(System.String,System.String,System.String)">
+            <summary>
+            Updates user login
+            </summary>
+            <param name="login">Login of the user whose details will be modified</param>
+            <param name="newLogin">New login</param>
+            <param name="modifiedBy">Login of the user initiating the update</param>
+            <returns>A Task.</returns>
+        </member>
+        <member name="M:UserManagement.Api.Services.Interfaces.IUserService.ReadAllActive">
+            <summary>
+            Gets all users who don't have their access revoked
+            </summary>
+            <returns>A list of found UserDTO objects</returns>
+        </member>
+        <member name="M:UserManagement.Api.Services.Interfaces.IUserService.Read(System.String)">
+            <summary>
+            Gets found user with the specified login
+            </summary>
+            <param name="login">User login to search for</param>
+            <returns>UserDTO corresponding to the user found; null if not found.</returns>
+        </member>
+        <member name="M:UserManagement.Api.Services.Interfaces.IUserService.Login(System.String,System.String)">
+            <summary>
+            
+            </summary>
+            <param name="login">User login to search for</param>
+            <param name="password">The password associated with the provided login to authenticate the user</param>
+            <returns>An access token corresponding to the user's role and a UserDTO object corresponding to the found user.</returns>
+        </member>
+        <member name="M:UserManagement.Api.Services.Interfaces.IUserService.ReadAllOlder(System.Int32)">
+            <summary>
+            Gets all users who are older then the age specified
+            </summary>
+            <param name="age">Age value</param>
+            <returns>A list of found UserDTO objects</returns>
+        </member>
+        <member name="M:UserManagement.Api.Services.Interfaces.IUserService.DeleteSoft(System.String,System.String)">
+            <summary>
+            Revokes access of the specified user
+            </summary>
+            <param name="login">Login of the user for whom access will be revoked</param>
+            <param name="revokedBy">Login of the user initiating the procedure</param>
+            <returns>A UserDTO object corresponding to the user whose access has been revoked.</returns>
+        </member>
+        <member name="M:UserManagement.Api.Services.Interfaces.IUserService.DeleteHard(System.String)">
+            <summary>
+            Completely removes the specified user from database
+            </summary>
+            <param name="login">Login of the user who is going to be removed</param>
+            <returns>A UserDTO object corresponding to the user who has been removed.</returns>
+        </member>
+        <member name="M:UserManagement.Api.Services.Interfaces.IUserService.Restore(System.String)">
+            <summary>
+            Lifts access restrictions for the specified user
+            </summary>
+            <param name="login">Login of the user for whose access restrictions will be lifted.</param>
+            <returns>A UserDTO object corresponding to the user whose restrictions have been lifted.</returns>
+        </member>
+        <member name="T:UserManagement.Api.Services.UserService">
+            <summary>
+            IUserService implementation
+            </summary>
+        </member>
+        <member name="M:UserManagement.Api.Services.UserService.#ctor(UserManagement.Api.Repositories.Interfaces.IUserRepository{UserManagement.Api.Entities.User},UserManagement.Api.Authentication.JWTAuth)">
+            <summary>
+            UserService constuctor
+            </summary>
+            <param name="userRepository">User repository to use</param>
+            <param name="jWTAuth">JWT authentication implementation to use</param>
+        </member>
+        <member name="M:UserManagement.Api.Services.UserService.CreateUser(UserManagement.Models.DTOs.UserDTO,System.String,System.String,System.Boolean,System.String)">
+            <inheritdoc />
+        </member>
+        <member name="M:UserManagement.Api.Services.UserService.UpdateUserInfo(System.String,System.String,System.Int32,System.String,System.String)">
+            <inheritdoc />
+        </member>
+        <member name="M:UserManagement.Api.Services.UserService.UpdateUserPassword(System.String,System.String,System.String)">
+            <inheritdoc />
+        </member>
+        <member name="M:UserManagement.Api.Services.UserService.UpdateLogin(System.String,System.String,System.String)">
+            <inheritdoc />
+        </member>
+        <member name="M:UserManagement.Api.Services.UserService.ReadAllActive">
+            <inheritdoc />
+        </member>
+        <member name="M:UserManagement.Api.Services.UserService.Read(System.String)">
+            <inheritdoc />
+        </member>
+        <member name="M:UserManagement.Api.Services.UserService.Login(System.String,System.String)">
+            <inheritdoc />
+        </member>
+        <member name="M:UserManagement.Api.Services.UserService.ReadAllOlder(System.Int32)">
+            <inheritdoc />
+        </member>
+        <member name="M:UserManagement.Api.Services.UserService.DeleteSoft(System.String,System.String)">
+            <inheritdoc />
+        </member>
+        <member name="M:UserManagement.Api.Services.UserService.DeleteHard(System.String)">
+            <inheritdoc />
+        </member>
+        <member name="M:UserManagement.Api.Services.UserService.Restore(System.String)">
+            <inheritdoc />
+        </member>
+    </members>
+</doc>

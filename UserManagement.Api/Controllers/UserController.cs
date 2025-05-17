@@ -8,12 +8,19 @@ using System.IdentityModel.Tokens.Jwt;
 
 namespace UserManagement.Api.Controllers
 {
+    /// <summary>
+    /// 
+    /// </summary>
     [Route("api/[controller]/[action]")]
     [ApiController]
     public class UserController : ControllerBase
     {
         private readonly IUserService _userService;
 
+        /// <summary>
+        /// A controller for user management
+        /// </summary>
+        /// <param name="userService">User service implementation to use</param>
         public UserController(IUserService userService)
         {
             _userService = userService;
@@ -62,7 +69,7 @@ namespace UserManagement.Api.Controllers
         /// <param name="login">User login</param>
         /// <param name="password">User password</param>
         /// <param name="admin">Is the user going to be an admin</param>
-        /// <returns></returns>
+        /// <returns>Response.</returns>
         [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<ActionResult> Create([FromBody] UserDTO user, string login, string password, bool admin)
@@ -70,13 +77,12 @@ namespace UserManagement.Api.Controllers
             try
             {
                 await _userService.CreateUser(user, login, password, admin, User.FindFirst(JwtRegisteredClaimNames.Nickname)!.Value);
+                return Ok();
             }
             catch (Exception ex)
             {
                 return ReturnError(ex);
             }
-
-            return Ok();
         }
         #endregion
 
@@ -85,10 +91,11 @@ namespace UserManagement.Api.Controllers
         /// <summary>
         /// Update method for changing name, gender and birthday of the user specified
         /// </summary>
+        /// <param name="login">User login</param>
         /// <param name="name">A new name value</param>
         /// <param name="gender">A new gender value</param>
         /// <param name="birthday">A new birthday value</param>
-        /// <returns></returns>
+        /// <returns>Response with the corresponding UserDTO object.</returns>
         [Authorize(Roles = "Admin, User")]
         [HttpPut]
         public async Task<ActionResult<UserDTO>> UpdateInfo(string login, string name, int gender, string birthday)
@@ -120,7 +127,7 @@ namespace UserManagement.Api.Controllers
         /// </summary>
         /// <param name="login">User login</param>
         /// <param name="password">A new password value</param>
-        /// <returns></returns>
+        /// <returns>Response.</returns>
         [Authorize(Roles = "Admin, User")]
         [HttpPut]
         public async Task<ActionResult> UpdatePassword(string login, string password)
@@ -146,7 +153,7 @@ namespace UserManagement.Api.Controllers
         /// </summary>
         /// <param name="login">User login</param>
         /// <param name="newLogin">A new login value</param>
-        /// <returns></returns>
+        /// <returns>Response.</returns>
         [Authorize(Roles = "Admin, User")]
         [HttpPut]
         public async Task<ActionResult> UpdateLogin(string login, string newLogin)
@@ -167,6 +174,11 @@ namespace UserManagement.Api.Controllers
             }
         }
 
+        /// <summary>
+        /// Lifts user's access restrictions
+        /// </summary>
+        /// <param name="login">User login</param>
+        /// <returns>Response with the corresponding UserDTO object.</returns>
         [Authorize(Roles = "Admin")]
         [HttpPut]
         public async Task<ActionResult<UserDTO>> Restore(string login)
@@ -180,7 +192,7 @@ namespace UserManagement.Api.Controllers
                     return NotFound();
                 }
 
-                return Ok();
+                return Ok(user);
             }
             catch (Exception ex)
             {
@@ -189,7 +201,10 @@ namespace UserManagement.Api.Controllers
         }
         #endregion
 
-
+        /// <summary>
+        /// Returns every active user
+        /// </summary>
+        /// <returns>Response with the user object</returns>
         #region Get
         [Authorize(Roles = "Admin")]
         [HttpGet]
@@ -205,9 +220,14 @@ namespace UserManagement.Api.Controllers
             }
         }
 
+        /// <summary>
+        /// Returns a found user by the specified login
+        /// </summary>
+        /// <param name="login">User login</param>
+        /// <returns>Response with the corresponding UserDTO object.</returns>
         [Authorize(Roles = "Admin")]
         [HttpGet]
-        public async Task<ActionResult> Read(string login)
+        public async Task<ActionResult<UserDTO>> Read(string login)
         {
             try
             {
@@ -225,6 +245,11 @@ namespace UserManagement.Api.Controllers
             }
         }
 
+        /// <summary>
+        /// Returns every user older than the age specified
+        /// </summary>
+        /// <param name="age">Age value</param>
+        /// <returns>Response with a list of UserDTO objects of the users found.</returns>
         [Authorize(Roles = "Admin")]
         [HttpGet]
         public ActionResult<List<UserDTO>> GetAllOlder(int age)
@@ -239,6 +264,12 @@ namespace UserManagement.Api.Controllers
             }
         }
 
+        /// <summary>
+        /// Login method
+        /// </summary>
+        /// <param name="login">User login</param>
+        /// <param name="password">User password</param>
+        /// <returns>Response with a generated access token.</returns>
         [HttpGet]
         public async Task<ActionResult<string>> Login(string login, string password)
         {
@@ -265,6 +296,11 @@ namespace UserManagement.Api.Controllers
 
 
         #region Delete
+        /// <summary>
+        /// Completely deletes the specified user
+        /// </summary>
+        /// <param name="login">User login</param>
+        /// <returns>Response with the corresponding UserDTO object.</returns>
         [Authorize(Roles = "Admin")]
         [HttpDelete]
         public async Task<ActionResult<UserDTO>> DeleteHard(string login)
@@ -286,6 +322,11 @@ namespace UserManagement.Api.Controllers
             }
         }
 
+        /// <summary>
+        /// Revokes access of the user specified
+        /// </summary>
+        /// <param name="login">User login</param>
+        /// <returns>Response with the corresponding UserDTO object.</returns>
         [Authorize(Roles = "Admin")]
         [HttpDelete]
         public async Task<ActionResult<UserDTO>> DeleteSoft(string login)

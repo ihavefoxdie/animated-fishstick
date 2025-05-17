@@ -5,14 +5,23 @@ using UserManagement.Api.Repositories.Interfaces;
 using UserManagement.Api.Services.Interfaces;
 using UserManagement.Models.DTOs;
 using System.Text.RegularExpressions;
+using System.Data;
 
 namespace UserManagement.Api.Services;
 
+/// <summary>
+/// IUserService implementation
+/// </summary>
 public class UserService : IUserService
 {
     private readonly IUserRepository<User> _userRepository;
     private readonly JWTAuth _jWTAuth;
 
+    /// <summary>
+    /// UserService constuctor
+    /// </summary>
+    /// <param name="userRepository">User repository to use</param>
+    /// <param name="jWTAuth">JWT authentication implementation to use</param>
     public UserService(IUserRepository<User> userRepository, JWTAuth jWTAuth)
     {
         _userRepository = userRepository;
@@ -21,7 +30,7 @@ public class UserService : IUserService
 
 
 
-
+    /// <inheritdoc />
     public async Task CreateUser(UserDTO user, string login, string password, bool admin, string createdBy)
     {
         CheckValues(user.Name, login, password);
@@ -50,12 +59,19 @@ public class UserService : IUserService
             RevokedBy = null,
         };
 
-        await _userRepository.Create(newUser);
+        if (await _userRepository.Read(x => x.Login == newUser.Login) == null)
+        {
+            await _userRepository.Create(newUser);
+        }
+        else
+        {
+            throw new DuplicateNameException("A user with the same login already exists.");
+        }
     }
 
 
 
-
+    /// <inheritdoc />
     public async Task<UserDTO?> UpdateUserInfo(string login, string name, int gender, string birthday, string modifiedBy)
     {
         CheckValues(login, name);
@@ -86,6 +102,7 @@ public class UserService : IUserService
         return userDTO;
     }
 
+    /// <inheritdoc />
     public async Task UpdateUserPassword(string login, string password, string modifiedBy)
     {
         CheckValues(login, password);
@@ -108,6 +125,7 @@ public class UserService : IUserService
         }
     }
 
+    /// <inheritdoc />
     public async Task UpdateLogin(string login, string newLogin, string modifiedBy)
     {
         CheckValues(login, newLogin);
@@ -131,7 +149,7 @@ public class UserService : IUserService
 
 
 
-
+    /// <inheritdoc />
     public async Task<List<UserDTO>> ReadAllActive()
     {
         Task<List<User>> users = Task.Run(() => _userRepository.ReadAll(x => x.RevokedOn == null).OrderBy(x => x.CreatedOn).ToList());
@@ -147,6 +165,7 @@ public class UserService : IUserService
         return usersDTO;
     }
 
+    /// <inheritdoc />
     public async Task<UserDTO?> Read(string login)
     {
         UserDTO? userDTO = null;
@@ -160,6 +179,7 @@ public class UserService : IUserService
         return userDTO;
     }
 
+    /// <inheritdoc />
     public async Task<(string?, UserDTO?)> Login(string login, string password)
     {
         UserDTO? userDTO = null;
@@ -181,6 +201,7 @@ public class UserService : IUserService
         return (token, userDTO);
     }
 
+    /// <inheritdoc />
     public List<UserDTO> ReadAllOlder(int age)
     {
         IEnumerable<User> users = _userRepository.ReadAll(x =>
@@ -204,7 +225,7 @@ public class UserService : IUserService
 
 
 
-
+    /// <inheritdoc />
     public async Task<UserDTO?> DeleteSoft(string login, string revokedBy)
     {
         User? user = await _userRepository.Read(x => x.Login == login);
@@ -223,6 +244,7 @@ public class UserService : IUserService
         return userDTO;
     }
 
+    /// <inheritdoc />
     public async Task<UserDTO?> DeleteHard(string login)
     {
         User? user = await _userRepository.Read(x => x.Login == login);
@@ -242,7 +264,7 @@ public class UserService : IUserService
 
 
 
-
+    /// <inheritdoc />
     public async Task<UserDTO?> Restore(string login)
     {
         CheckValues(login);
@@ -269,19 +291,10 @@ public class UserService : IUserService
     {
         return new UserDTO
         {
-            //Guid = user.Guid,
-            //Login = user.Login,
-            //Password = user.Password,
             Name = user.Name,
             Gender = user.Gender,
             Birthday = user.Birthday,
-            //Admin = user.Admin,
-            //CreatedOn = user.CreatedOn,
-            //CreatedBy = user.CreatedBy,
-            //ModifiedOn = user.ModifiedOn,
-            //ModifiedBy = user.ModifiedBy,
-            RevokedOn = user.RevokedOn,
-            //RevokedBy = user.RevokedBy,
+            Active = user.RevokedOn == null ? true : false,
         };
     }
 

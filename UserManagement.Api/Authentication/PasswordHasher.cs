@@ -3,6 +3,9 @@ using BCrypt.Net;
 
 namespace UserManagement.Api.Authentication;
 
+/// <summary>
+/// This class is used for hashing passwords and/or verifying them using bcrypt
+/// </summary>
 public static class PasswordHasher
 {
     /// <summary>
