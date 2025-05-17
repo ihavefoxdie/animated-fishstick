@@ -8,5 +8,4 @@ public class UserDTO
     public int Gender { get; init; }
     public DateTime? Birthday { get; init; }
     public bool Active { get; init; } = true;
-    //public DateTime? RevokedOn { get; set; } = null;
 }

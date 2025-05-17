@@ -185,6 +185,18 @@
         <member name="M:UserManagement.Api.Migrations.InitialMigration.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
             <inheritdoc />
         </member>
+        <member name="T:UserManagement.Api.Migrations.new05172025">
+            <inheritdoc />
+        </member>
+        <member name="M:UserManagement.Api.Migrations.new05172025.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:UserManagement.Api.Migrations.new05172025.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:UserManagement.Api.Migrations.new05172025.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
         <member name="T:UserManagement.Api.Repositories.Interfaces.IUserRepository`1">
             <summary>
             User repository interface
