@@ -40,7 +40,7 @@ builder.Services.AddAuthentication(cfg =>
         x.TokenValidationParameters = new()
         {
             ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["ApplicationSettings:JWT:Secret"])),
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["ApplicationSettings:JWT:Secret"] ?? throw new ArgumentNullException("The JWT secret is missing!"))),
             ValidateIssuer = true,
             ValidateAudience = true,
             ValidIssuer = builder.Configuration["ApplicationSettings:JWT:ValidIssuer"],

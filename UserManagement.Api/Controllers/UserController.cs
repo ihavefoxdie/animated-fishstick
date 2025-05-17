@@ -3,11 +3,11 @@ using UserManagement.Models.DTOs;
 using UserManagement.Api.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using UserManagement.Api.Services.Interfaces;
+using System.Security.Claims;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace UserManagement.Api.Controllers
 {
-    //TODO: use bcrypt
-    //TODO: implement jwt functionality
     [Route("api/[controller]/[action]")]
     [ApiController]
     public class UserController : ControllerBase
@@ -23,26 +23,53 @@ namespace UserManagement.Api.Controllers
 
 
         #region Post 
+        /// <summary>
+        /// Checks if this controller is functional
+        /// </summary>
+        /// <returns>Result</returns>
         [HttpPost]
         public ActionResult Test()
         {
             return Ok();
         }
 
+        /// <summary>
+        /// Checks if admin authorization is working
+        /// </summary>
+        /// <returns>Result</returns>
         [Authorize(Roles = "Admin")]
         [HttpPost]
-        public ActionResult AuthTest()
+        public ActionResult AdminTest()
         {
             return Ok();
         }
 
+        /// <summary>
+        /// Checks if user authorization is working
+        /// </summary>
+        /// <returns>Result</returns>
+        [Authorize(Roles = "User")]
+        [HttpPost]
+        public ActionResult UserTest()
+        {
+            return Ok();
+        }
+
+        /// <summary>
+        /// User creation method, only accessible to admins
+        /// </summary>
+        /// <param name="user">User object with basic information</param>
+        /// <param name="login">User login</param>
+        /// <param name="password">User password</param>
+        /// <param name="admin">Is the user going to be an admin</param>
+        /// <returns></returns>
         [Authorize(Roles = "Admin")]
         [HttpPost]
-        public async Task<ActionResult> Create([FromBody] UserDTO user, string login, string password, bool admin, string createdBy)
+        public async Task<ActionResult> Create([FromBody] UserDTO user, string login, string password, bool admin)
         {
             try
             {
-                await _userService.CreateUser(user, login, password, admin, createdBy);
+                await _userService.CreateUser(user, login, password, admin, User.FindFirst(JwtRegisteredClaimNames.Nickname)!.Value);
             }
             catch (Exception ex)
             {
@@ -58,17 +85,22 @@ namespace UserManagement.Api.Controllers
         /// <summary>
         /// Update method for changing name, gender and birthday of the user specified
         /// </summary>
-        /// <param name="guid">User Guid</param>
         /// <param name="name">A new name value</param>
         /// <param name="gender">A new gender value</param>
         /// <param name="birthday">A new birthday value</param>
         /// <returns></returns>
+        [Authorize(Roles = "Admin, User")]
         [HttpPut]
         public async Task<ActionResult<UserDTO>> UpdateInfo(string login, string name, int gender, string birthday)
         {
             try
             {
-                UserDTO? user = await _userService.UpdateUserInfo(login, name, gender, birthday);
+                if (!User.Claims.Any(c => c.Value == "Admin" || c.Value == login))
+                {
+                    return Unauthorized();
+                }
+
+                UserDTO? user = await _userService.UpdateUserInfo(login, name, gender, birthday, User.FindFirst(JwtRegisteredClaimNames.Nickname)!.Value);
 
                 if (user == null)
                 {
@@ -86,15 +118,21 @@ namespace UserManagement.Api.Controllers
         /// <summary>
         /// Update method for changing password of the user specified
         /// </summary>
-        /// <param name="guid">User Guid</param>
+        /// <param name="login">User login</param>
         /// <param name="password">A new password value</param>
         /// <returns></returns>
+        [Authorize(Roles = "Admin, User")]
         [HttpPut]
         public async Task<ActionResult> UpdatePassword(string login, string password)
         {
             try
             {
-                await _userService.UpdateUserPassword(login, password);
+                if (!User.Claims.Any(c => c.Value == "Admin" || c.Value == login))
+                {
+                    return Unauthorized();
+                }
+
+                await _userService.UpdateUserPassword(login, password, User.FindFirst(JwtRegisteredClaimNames.Nickname)!.Value);
                 return Ok();
             }
             catch (Exception ex)
@@ -104,17 +142,23 @@ namespace UserManagement.Api.Controllers
         }
 
         /// <summary>
-        /// Update method for changing lgoin of the user specified
+        /// Update method for changing login of the user specified
         /// </summary>
-        /// <param name="guid">User Guid</param>
-        /// <param name="login">A new login value</param>
+        /// <param name="login">User login</param>
+        /// <param name="newLogin">A new login value</param>
         /// <returns></returns>
+        [Authorize(Roles = "Admin, User")]
         [HttpPut]
-        public async Task<ActionResult> UpdateLogin(string login)
+        public async Task<ActionResult> UpdateLogin(string login, string newLogin)
         {
             try
             {
-                await _userService.UpdateLogin(login);
+                if (!User.Claims.Any(c => c.Value == "Admin" || c.Value == login))
+                {
+                    return Unauthorized();
+                }
+
+                await _userService.UpdateLogin(login, newLogin, User.FindFirst(JwtRegisteredClaimNames.Nickname)!.Value);
                 return Ok();
             }
             catch (Exception ex)
@@ -123,6 +167,7 @@ namespace UserManagement.Api.Controllers
             }
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPut]
         public async Task<ActionResult<UserDTO>> Restore(string login)
         {
@@ -146,6 +191,7 @@ namespace UserManagement.Api.Controllers
 
 
         #region Get
+        [Authorize(Roles = "Admin")]
         [HttpGet]
         public async Task<ActionResult<List<UserDTO>>> ReadAllActive()
         {
@@ -179,6 +225,20 @@ namespace UserManagement.Api.Controllers
             }
         }
 
+        [Authorize(Roles = "Admin")]
+        [HttpGet]
+        public ActionResult<List<UserDTO>> GetAllOlder(int age)
+        {
+            try
+            {
+                return Ok(_userService.ReadAllOlder(age));
+            }
+            catch (Exception ex)
+            {
+                return ReturnError(ex);
+            }
+        }
+
         [HttpGet]
         public async Task<ActionResult<string>> Login(string login, string password)
         {
@@ -201,6 +261,7 @@ namespace UserManagement.Api.Controllers
             }
         }
         #endregion
+
 
 
         #region Delete
@@ -231,7 +292,7 @@ namespace UserManagement.Api.Controllers
         {
             try
             {
-                UserDTO? user = await _userService.DeleteSoft(login);
+                UserDTO? user = await _userService.DeleteSoft(login, User.FindFirst(JwtRegisteredClaimNames.Nickname)!.Value);
 
                 if (user == null)
                 {
@@ -246,6 +307,7 @@ namespace UserManagement.Api.Controllers
             }
         }
         #endregion
+
 
 
         private ActionResult ReturnError(Exception ex)

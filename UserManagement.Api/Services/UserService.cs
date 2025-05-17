@@ -46,7 +46,7 @@ public class UserService : IUserService
             CreatedBy = createdBy,
             ModifiedOn = DateTime.UtcNow,
             ModifiedBy = createdBy,
-            RevokedOn = user.RevokedOn,
+            RevokedOn = null,
             RevokedBy = null,
         };
 
@@ -56,7 +56,7 @@ public class UserService : IUserService
 
 
 
-    public async Task<UserDTO?> UpdateUserInfo(string login, string name, int gender, string birthday)
+    public async Task<UserDTO?> UpdateUserInfo(string login, string name, int gender, string birthday, string modifiedBy)
     {
         CheckValues(login, name);
 
@@ -68,6 +68,14 @@ public class UserService : IUserService
 
         if (foundUser != null)
         {
+            CheckAccess(foundUser);
+
+            foundUser.Name = name;
+            foundUser.Gender = gender;
+            foundUser.Birthday = DateTime.Parse(birthday).ToUniversalTime();
+            foundUser.ModifiedBy = modifiedBy;
+            foundUser.ModifiedOn = DateTime.UtcNow;
+
             foundUser = await _userRepository.Update(foundUser);
             if (foundUser != null)
             {
@@ -78,36 +86,45 @@ public class UserService : IUserService
         return userDTO;
     }
 
-    public async Task UpdateUserPassword(string login, string password)
+    public async Task UpdateUserPassword(string login, string password, string modifiedBy)
     {
         CheckValues(login, password);
 
         Regex regex = RegularExpressions.GetLatinAndNumbers();
         CheckRegexCompliance(regex, password);
 
-        string hashedPassword = PasswordHasher.HashPassword(password);
-
         User? foundUser = await _userRepository.Read(x => x.Login == login);
 
         if (foundUser != null)
         {
+            CheckAccess(foundUser);
+
+            string hashedPassword = PasswordHasher.HashPassword(password);
             foundUser.Password = hashedPassword;
+            foundUser.ModifiedBy = modifiedBy;
+            foundUser.ModifiedOn = DateTime.UtcNow;
+
             await _userRepository.Update(foundUser);
         }
     }
 
-    public async Task UpdateLogin(string login)
+    public async Task UpdateLogin(string login, string newLogin, string modifiedBy)
     {
-        CheckValues(login);
+        CheckValues(login, newLogin);
 
         Regex regex = RegularExpressions.GetLatinAndNumbers();
-        CheckRegexCompliance(regex, login);
+        CheckRegexCompliance(regex, login, newLogin);
 
         User? foundUser = await _userRepository.Read(x => x.Login == login);
 
         if (foundUser != null)
         {
-            foundUser.Login = login;
+            CheckAccess(foundUser);
+
+            foundUser.Login = newLogin;
+            foundUser.ModifiedBy = modifiedBy;
+            foundUser.ModifiedOn = DateTime.UtcNow;
+
             await _userRepository.Update(foundUser);
         }
     }
@@ -146,16 +163,18 @@ public class UserService : IUserService
     public async Task<(string?, UserDTO?)> Login(string login, string password)
     {
         UserDTO? userDTO = null;
-        User? user = await _userRepository.Read(x => x.Login == login);
+        User? foundUser = await _userRepository.Read(x => x.Login == login);
         string? token = null;
 
-        if (user != null)
+        if (foundUser != null)
         {
-            bool check = PasswordHasher.VerifyPassword(password, user.Password);
+            CheckAccess(foundUser);
+
+            bool check = PasswordHasher.VerifyPassword(password, foundUser.Password);
             if (check)
             {
-                userDTO = ConvertToDTO(user);
-                token = _jWTAuth.CreateToken(user);
+                userDTO = ConvertToDTO(foundUser);
+                token = _jWTAuth.CreateToken(foundUser);
             }
         }
 
@@ -186,7 +205,7 @@ public class UserService : IUserService
 
 
 
-    public async Task<UserDTO?> DeleteSoft(string login)
+    public async Task<UserDTO?> DeleteSoft(string login, string revokedBy)
     {
         User? user = await _userRepository.Read(x => x.Login == login);
         UserDTO? userDTO = null;
@@ -285,6 +304,14 @@ public class UserService : IUserService
             {
                 throw new ArgumentException("One or more arguments are incorrect.");
             }
+        }
+    }
+
+    private static void CheckAccess(User user)
+    {
+        if (user.RevokedOn != null)
+        {
+            throw new UnauthorizedAccessException("This user's access has been revoked!");
         }
     }
 }

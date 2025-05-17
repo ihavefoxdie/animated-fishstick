@@ -8,9 +8,9 @@ public interface IUserService
     public Task CreateUser(UserDTO user, string login, string password, bool admin, string createdBy);
 
 
-    public Task<UserDTO?> UpdateUserInfo(string login, string name, int gender, string birthday);
-    public Task UpdateUserPassword(string login, string password);
-    public Task UpdateLogin(string login);
+    public Task<UserDTO?> UpdateUserInfo(string login, string name, int gender, string birthday, string modifiedBy);
+    public Task UpdateUserPassword(string login, string password, string modifiedBy);
+    public Task UpdateLogin(string login, string newLogin, string modifiedBy);
 
 
     public Task<List<UserDTO>> ReadAllActive();
@@ -19,7 +19,7 @@ public interface IUserService
     public List<UserDTO> ReadAllOlder(int age);
 
 
-    public Task<UserDTO?> DeleteSoft(string login);
+    public Task<UserDTO?> DeleteSoft(string login, string revokedBy);
     public Task<UserDTO?> DeleteHard(string login);
 
 
