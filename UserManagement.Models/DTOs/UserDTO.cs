@@ -1,11 +1,6 @@
 using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace UserManagement.Models.DTOs;
 
-public class UserDTO
-{
-    public required string Name { get; init; }
-    public int Gender { get; init; }
-    public DateTime? Birthday { get; init; }
-    public bool Active { get; init; } = true;
-}
+public record UserDTO(string Name, int Gender, DateTime? Birthday, bool Active);

@@ -298,15 +298,15 @@ public class UserService : IUserService
     }
 
 
+    //TODO: Factory method
     private static UserDTO ConvertToDTO(User user)
     {
-        return new UserDTO
-        {
-            Name = user.Name,
-            Gender = user.Gender,
-            Birthday = user.Birthday,
-            Active = user.RevokedOn == null ? true : false,
-        };
+        return new UserDTO(
+            user.Name,
+            user.Gender,
+            user.Birthday,
+            user.RevokedOn == null ? true : false
+        );
     }
 
     private static void CheckValues(params string[] values)
