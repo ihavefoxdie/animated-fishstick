@@ -10,6 +10,7 @@ using UserManagement.Api.Repositories;
 using UserManagement.Api.Services;
 using UserManagement.Api.Services.Interfaces;
 using UserManagement.Api.Authentication;
+using UserManagement.Models.DTOs;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -20,6 +21,7 @@ builder.Services.AddOpenApi();
 
 builder.Services.AddScoped<IUserRepository<User>, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IUserFactory<UserDTO>, UserDTOFactory>();
 builder.Services.AddSingleton<JWTAuth>();
 
 builder.Services.AddDbContextPool<UserDbContext>(options =>

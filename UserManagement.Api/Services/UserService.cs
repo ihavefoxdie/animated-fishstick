@@ -15,18 +15,22 @@ namespace UserManagement.Api.Services;
 public class UserService : IUserService
 {
     private readonly IUserRepository<User> _userRepository;
+    private readonly IUserFactory<UserDTO> _userFactory;
     private readonly JWTAuth _jWTAuth;
 
     /// <summary>
     /// UserService constuctor
     /// </summary>
-    /// <param name="userRepository">User repository to use</param>
-    /// <param name="jWTAuth">JWT authentication implementation to use</param>
-    public UserService(IUserRepository<User> userRepository, JWTAuth jWTAuth)
+    /// <param name="userRepository">User repository to use.</param>
+    /// <param name="jWTAuth">JWT authentication implementation to use.</param>
+    /// <param name="userFactory">User factory for DTO models to use.</param>
+    public UserService(IUserRepository<User> userRepository, JWTAuth jWTAuth, IUserFactory<UserDTO> userFactory)
     {
         _userRepository = userRepository;
+        _userFactory = userFactory;
         _jWTAuth = jWTAuth;
     }
+
 
 
 
@@ -95,7 +99,7 @@ public class UserService : IUserService
             foundUser = await _userRepository.Update(foundUser);
             if (foundUser != null)
             {
-                userDTO = ConvertToDTO(foundUser);
+                userDTO = _userFactory.CreateModel(foundUser);
             }
         }
 
@@ -159,7 +163,7 @@ public class UserService : IUserService
 
         foreach (User user in users.Result)
         {
-            usersDTO.Add(ConvertToDTO(user));
+            usersDTO.Add(_userFactory.CreateModel(user));
         }
 
         return usersDTO;
@@ -173,7 +177,7 @@ public class UserService : IUserService
 
         if (user != null)
         {
-            userDTO = ConvertToDTO(user);
+            userDTO = _userFactory.CreateModel(user);
         }
 
         return userDTO;
@@ -193,7 +197,7 @@ public class UserService : IUserService
             bool check = PasswordHasher.VerifyPassword(password, foundUser.Password);
             if (check)
             {
-                userDTO = ConvertToDTO(foundUser);
+                userDTO = _userFactory.CreateModel(foundUser);
                 token = _jWTAuth.CreateToken(foundUser);
             }
         }
@@ -228,7 +232,7 @@ public class UserService : IUserService
 
         foreach (User user in users)
         {
-            usersDTO.Add(ConvertToDTO(user));
+            usersDTO.Add(_userFactory.CreateModel(user));
         }
 
         return usersDTO;
@@ -248,7 +252,7 @@ public class UserService : IUserService
 
             if (await _userRepository.Update(user) != null)
             {
-                userDTO = ConvertToDTO(user);
+                userDTO = _userFactory.CreateModel(user);
             }
         }
 
@@ -266,7 +270,7 @@ public class UserService : IUserService
         {
             if (await _userRepository.Delete(user) != null)
             {
-                userDTO = ConvertToDTO(user);
+                userDTO = _userFactory.CreateModel(user);
             }
         }
 
@@ -290,23 +294,11 @@ public class UserService : IUserService
 
             if (await _userRepository.Update(user) != null)
             {
-                userDTO = ConvertToDTO(user);
+                userDTO = _userFactory.CreateModel(user);
             }
         }
 
         return userDTO;
-    }
-
-
-    //TODO: Factory method
-    private static UserDTO ConvertToDTO(User user)
-    {
-        return new UserDTO(
-            user.Name,
-            user.Gender,
-            user.Birthday,
-            user.RevokedOn == null ? true : false
-        );
     }
 
     private static void CheckValues(params string[] values)
