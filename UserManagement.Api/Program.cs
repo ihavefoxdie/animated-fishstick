@@ -11,7 +11,8 @@ using UserManagement.Api.Services;
 using UserManagement.Api.Services.Interfaces;
 using UserManagement.Api.Authentication;
 using UserManagement.Models.DTOs;
-
+using AutoMapper;
+using UserManagement.Api.Mappings.Profiles;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,8 +22,8 @@ builder.Services.AddOpenApi();
 
 builder.Services.AddScoped<IUserRepository<User>, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<IUserFactory<UserDTO>, UserDTOFactory>();
 builder.Services.AddSingleton<JWTAuth>();
+builder.Services.AddAutoMapper(typeof(UserProfile));
 
 builder.Services.AddDbContextPool<UserDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("UserServiceConnection"))

@@ -243,6 +243,16 @@
             Login of the user responsible for revoking access from this user.
             </summary>
         </member>
+        <member name="T:UserManagement.Api.Mappings.Profiles.UserProfile">
+            <summary>
+            Profile for <see cref="T:UserManagement.Api.Entities.User"/> mapping to <see cref="T:UserManagement.Models.DTOs.UserDTO"/>.
+            </summary>
+        </member>
+        <member name="M:UserManagement.Api.Mappings.Profiles.UserProfile.#ctor">
+            <summary>
+            A ctor; specifies how mapping from <see cref="T:UserManagement.Api.Entities.User"/> to <see cref="T:UserManagement.Models.DTOs.UserDTO"/> must be done.
+            </summary>
+        </member>
         <member name="T:UserManagement.Api.Migrations.InitialMigration">
             <inheritdoc />
         </member>
@@ -340,19 +350,6 @@
         <member name="M:UserManagement.Api.Repositories.UserRepository.Delete(UserManagement.Api.Entities.User)">
             <inheritdoc />
         </member>
-        <member name="T:UserManagement.Api.Services.Interfaces.IUserFactory`1">
-            <summary>
-            Abstact factory interface for converting <see cref="T:UserManagement.Api.Entities.User"/> entities to <typeparamref name="T"/>.
-            </summary>
-            <typeparam name="T">A type to convert to or from (for example, a DTO model).</typeparam>
-        </member>
-        <member name="M:UserManagement.Api.Services.Interfaces.IUserFactory`1.CreateModel(UserManagement.Api.Entities.User)">
-            <summary>
-            Converts from a <typeparamref name="T"/> entity to <see cref="T:UserManagement.Api.Entities.User"/>. 
-            </summary>
-            <param name="entity">A <see cref="T:UserManagement.Api.Entities.User"/> entity to convert from.</param>
-            <returns>New entity of the type <typeparamref name="T"/>.</returns>
-        </member>
         <member name="T:UserManagement.Api.Services.Interfaces.IUserService">
             <summary>
             A user interface
@@ -448,26 +445,18 @@
             <param name="login">Login of the user for whose access restrictions will be lifted.</param>
             <returns>A UserDTO object corresponding to the user whose restrictions have been lifted.</returns>
         </member>
-        <member name="T:UserManagement.Api.Services.UserDTOFactory">
-            <summary>
-            A factory for converting <see cref="T:UserManagement.Api.Entities.User"/> entities to <see cref="T:UserManagement.Models.DTOs.UserDTO"/>.
-            </summary>
-        </member>
-        <member name="M:UserManagement.Api.Services.UserDTOFactory.CreateModel(UserManagement.Api.Entities.User)">
-            <inheritdoc />
-        </member>
         <member name="T:UserManagement.Api.Services.UserService">
             <summary>
             IUserService implementation
             </summary>
         </member>
-        <member name="M:UserManagement.Api.Services.UserService.#ctor(UserManagement.Api.Repositories.Interfaces.IUserRepository{UserManagement.Api.Entities.User},UserManagement.Api.Authentication.JWTAuth,UserManagement.Api.Services.Interfaces.IUserFactory{UserManagement.Models.DTOs.UserDTO})">
+        <member name="M:UserManagement.Api.Services.UserService.#ctor(UserManagement.Api.Repositories.Interfaces.IUserRepository{UserManagement.Api.Entities.User},UserManagement.Api.Authentication.JWTAuth,AutoMapper.IMapper)">
             <summary>
             UserService constuctor
             </summary>
             <param name="userRepository">User repository to use.</param>
             <param name="jWTAuth">JWT authentication implementation to use.</param>
-            <param name="userFactory">User factory for DTO models to use.</param>
+            <param name="mapper">Mapper for DTO conversions.</param>
         </member>
         <member name="M:UserManagement.Api.Services.UserService.CreateUser(UserManagement.Models.DTOs.UserDTO,System.String,System.String,System.Boolean,System.String)">
             <inheritdoc />

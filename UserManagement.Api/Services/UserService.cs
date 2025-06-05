@@ -6,6 +6,7 @@ using UserManagement.Api.Services.Interfaces;
 using UserManagement.Models.DTOs;
 using System.Text.RegularExpressions;
 using System.Data;
+using AutoMapper;
 
 namespace UserManagement.Api.Services;
 
@@ -15,7 +16,8 @@ namespace UserManagement.Api.Services;
 public class UserService : IUserService
 {
     private readonly IUserRepository<User> _userRepository;
-    private readonly IUserFactory<UserDTO> _userFactory;
+    //private readonly IUserMapper<UserDTO> _userFactory;
+    private readonly IMapper _mapper;
     private readonly JWTAuth _jWTAuth;
 
     /// <summary>
@@ -23,11 +25,11 @@ public class UserService : IUserService
     /// </summary>
     /// <param name="userRepository">User repository to use.</param>
     /// <param name="jWTAuth">JWT authentication implementation to use.</param>
-    /// <param name="userFactory">User factory for DTO models to use.</param>
-    public UserService(IUserRepository<User> userRepository, JWTAuth jWTAuth, IUserFactory<UserDTO> userFactory)
+    /// <param name="mapper">Mapper for DTO conversions.</param>
+    public UserService(IUserRepository<User> userRepository, JWTAuth jWTAuth, IMapper mapper)
     {
         _userRepository = userRepository;
-        _userFactory = userFactory;
+        _mapper = mapper;
         _jWTAuth = jWTAuth;
     }
 
@@ -99,7 +101,7 @@ public class UserService : IUserService
             foundUser = await _userRepository.Update(foundUser);
             if (foundUser != null)
             {
-                userDTO = _userFactory.CreateModel(foundUser);
+                userDTO = _mapper.Map<UserDTO>(foundUser);
             }
         }
 
@@ -163,7 +165,7 @@ public class UserService : IUserService
 
         foreach (User user in users.Result)
         {
-            usersDTO.Add(_userFactory.CreateModel(user));
+            usersDTO.Add(_mapper.Map<UserDTO>(user));
         }
 
         return usersDTO;
@@ -177,7 +179,7 @@ public class UserService : IUserService
 
         if (user != null)
         {
-            userDTO = _userFactory.CreateModel(user);
+            userDTO = _mapper.Map<UserDTO>(user);
         }
 
         return userDTO;
@@ -197,7 +199,7 @@ public class UserService : IUserService
             bool check = PasswordHasher.VerifyPassword(password, foundUser.Password);
             if (check)
             {
-                userDTO = _userFactory.CreateModel(foundUser);
+                userDTO = _mapper.Map<UserDTO>(foundUser);
                 token = _jWTAuth.CreateToken(foundUser);
             }
         }
@@ -232,7 +234,7 @@ public class UserService : IUserService
 
         foreach (User user in users)
         {
-            usersDTO.Add(_userFactory.CreateModel(user));
+            usersDTO.Add(_mapper.Map<UserDTO>(user));
         }
 
         return usersDTO;
@@ -252,7 +254,7 @@ public class UserService : IUserService
 
             if (await _userRepository.Update(user) != null)
             {
-                userDTO = _userFactory.CreateModel(user);
+                userDTO = _mapper.Map<UserDTO>(user);
             }
         }
 
@@ -270,7 +272,7 @@ public class UserService : IUserService
         {
             if (await _userRepository.Delete(user) != null)
             {
-                userDTO = _userFactory.CreateModel(user);
+                userDTO = _mapper.Map<UserDTO>(user);
             }
         }
 
@@ -294,7 +296,7 @@ public class UserService : IUserService
 
             if (await _userRepository.Update(user) != null)
             {
-                userDTO = _userFactory.CreateModel(user);
+                userDTO = _mapper.Map<UserDTO>(user);
             }
         }
 
