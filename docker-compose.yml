@@ -1,6 +1,6 @@
 services:
   database:
-    image: postgres:15
+    image: postgres:17
     restart: always
     environment:
       POSTGRES_USER: postgres
@@ -13,16 +13,13 @@ services:
   webapi:
     build: .
     ports:
-      - "8080:8080"
+      - "7026:7026"
     depends_on:
       - database
     environment:
-      ConnectionStrings__UserServiceConnection: >
-        Host=database;
-        Port=5432;
-        Database=UserService;
-        Username=postgres
-        Password=qwerty123;
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: "http://+:7026"
+      ConnectionStrings__UserServiceConnection: "Host=database;Port=5432;Database=UserService;Username=postgres;Password=qwerty123;"
     networks:
       - backend
 

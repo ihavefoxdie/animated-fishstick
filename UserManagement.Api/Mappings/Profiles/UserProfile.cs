@@ -16,6 +16,10 @@ public class UserProfile : Profile
     public UserProfile()
     {
         CreateMap<User, UserDTO>()
-        .ForMember(dest => dest.Active, memberOptions => memberOptions.MapFrom(sourceMember => sourceMember.RevokedOn == null));
+            .ForCtorParam(ctorParamName: "Name", opt => opt.MapFrom(src => src.Name))
+            .ForCtorParam(ctorParamName: "Gender", opt => opt.MapFrom(src => src.Gender))
+            .ForCtorParam(ctorParamName: "Birthday", opt => opt.MapFrom(src => src.Birthday))
+            .ForCtorParam(ctorParamName: "Active", opt => opt.MapFrom(src => src.RevokedOn == null));
+
     }
 }
